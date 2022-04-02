@@ -10,7 +10,6 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-#define IR_PIN 6
 #define SERVO_PIN 8
 #define BUTTON1_PIN 2 
 #define BUTTON2_PIN 3
@@ -27,6 +26,15 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 Bounce2::Button button1 = Bounce2::Button();
 Bounce2::Button button2 = Bounce2::Button();
 
+const int SHORT_PRESS_TIME = 500; // 500 milliseconds
+
+// Variables will change:
+int lastState = LOW;  // the previous state from the input pin
+int currentState;     // the current reading from the input pin
+unsigned long pressedTimeStamp  = 0;
+unsigned long releasedTimeStamp = 0;
+unsigned long elaps=0;
+
 Servo myservo;  // create servo object to control a servo
 // twelve servo objects can be created on most boards
 
@@ -34,14 +42,13 @@ int servoClose = 10; // variable to store the servo position initial
 int servoThrow = 170; // variable to store the servo position turned
 int servoStep=5; // increment decrement value
 int servoPos; // actual position value
-int servoStatus=0; // 0=servo initial Position 1=servo turned
 
 void setup() {
   
   Serial.begin(9600);
     // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
-    Serial.println(F("SSD1306 allocation failed"));
+    Serial.println(("SSD1306 allocation failed"));
     for(;;); // Don't proceed, loop forever
   }
 
@@ -50,7 +57,6 @@ void setup() {
   display.display();
   delay(2000); // Pause for 2 seconds
   
-  pinMode (IR_PIN, INPUT);
   myservo.attach(SERVO_PIN);  // attaches the servo on pin 9 to the servo object
   button1.attach( BUTTON1_PIN, INPUT ); // decrease USE EXTERNAL PULL-UP 10K resistor
   button2.attach( BUTTON2_PIN, INPUT ); // increae USE EXTERNAL PULL-UP 10K resistor
@@ -73,36 +79,49 @@ void loop() {
    
   button1.update(); // UPDATE THE BUTTON YOU MUST CALL THIS EVERY LOOP
   button2.update(); // UPDATE THE BUTTON YOU MUST CALL THIS EVERY LOOP
+
+  if ( button1.rose()  ) {  
+   pressedTimeStamp = millis();
+    Serial.println(pressedTimeStamp);
+}
+  if ( button1.fell()) {
+      releasedTimeStamp = millis();
+      Serial.println(releasedTimeStamp);
+      elaps=releasedTimeStamp-pressedTimeStamp;
+      
+      if((releasedTimeStamp>pressedTimeStamp+3000)){
+        servoPos=servoClose;
+        Serial.println("reset servo position");
+      }
+  }
   
-  if ( button1.pressed() ) { //decrease the value
+  if ( button1.pressed() ) { //increase the value 
     if ((servoPos-servoStep)>=servoClose){ //enough to decrease
       myservo.write(servoPos-servoStep);
       servoPos=servoPos-servoStep;      
-      Serial << "button1 " << servoPos <<endl;
+      Serial << "ServoPos " << servoPos <<endl;
     }
     else {
       myservo.write(servoClose);
       servoPos=servoClose;
       Serial << "button1 " << servoPos <<endl;
-      servoStatus=0;
    }
   }
+  
   if ( button2.pressed() ) { //increase the value
     if ((servoPos+servoStep)<=servoThrow){
       myservo.write(servoPos+servoStep);
       servoPos=servoPos+servoStep;
-      Serial << "button2 " << servoPos <<endl;
-      servoStatus=1;   
+      Serial << "button2 " << servoPos <<endl;  
       }
     else{
       myservo.write(servoThrow);
       servoPos=servoThrow;
-      servoStatus=1;
       Serial << "button2 " << servoPos <<endl;
     }
   }
-  Prn_Oled();
   
+  Prn_Oled();
 }
 
 void Prn_Oled(){
