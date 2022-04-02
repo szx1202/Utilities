@@ -1,2 +1,2 @@
-
-servo_2Button: Calibrate Servo rotation by using 2 Button to increment\decrement for a pre selected value
+servoRot_Enc.ino: Calibrate Servo rotation by using a Rotary Encoder to increment\decrement for a pre selected value
+servo_2Button.ino: Calibrate Servo rotation by using 2 Button to increment\decrement for a pre selected value
