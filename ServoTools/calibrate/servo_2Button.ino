@@ -26,7 +26,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 Bounce2::Button button1 = Bounce2::Button();
 Bounce2::Button button2 = Bounce2::Button();
 
-const int SHORT_PRESS_TIME = 500; // 500 milliseconds
+const int PRESS_TIME = 2000; // 2000 milliseconds
 
 // Variables will change:
 int lastState = LOW;  // the previous state from the input pin
@@ -89,7 +89,7 @@ void loop() {
       Serial.println(releasedTimeStamp);
       elaps=releasedTimeStamp-pressedTimeStamp;
       
-      if((releasedTimeStamp>pressedTimeStamp+3000)){
+      if((releasedTimeStamp>pressedTimeStamp+PRESS_TIME)){
         servoPos=servoClose;
         Serial.println("reset servo position");
       }
