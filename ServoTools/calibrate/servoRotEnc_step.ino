@@ -9,9 +9,9 @@
 #include <Adafruit_SSD1306.h>
 
 // Rotary Encoder Inputs
-#define inputCLK 4
-#define inputDT 5
-#define inputSW 6 
+#define INPUT_CLK 4
+#define INPUT_DT 5
+#define INPUT_SW 6 
 #define SERVO_PIN 9
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 32 // OLED display height, in pixels
@@ -21,7 +21,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 Servo myservo;
 int servoClose = 10; // variable to store the servo position initial
-int servoThrow = 179; // variable to store the servo position turned
+int servoThrow = 170; // variable to store the servo position turned
 int servoStep=5; // increment decrement value
 int counter = 1; // Encoder step value
 int servoPos= servoClose; // actual position value
@@ -32,9 +32,9 @@ unsigned long lastButtonPress = 0;
 void setup() { 
   
   // Set encoder pins as inputs  
-  pinMode (inputCLK,INPUT);
-  pinMode (inputDT,INPUT);
-  pinMode (inputSW,INPUT_PULLUP);
+  pinMode (INPUT_CLK,INPUT);
+  pinMode (INPUT_DT,INPUT);
+  pinMode (INPUT_SW,INPUT_PULLUP);
  
   Serial.begin (9600);
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
@@ -51,33 +51,26 @@ void setup() {
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(0,0);
   Prn_Oled();
-//  display.print("servoClose= ");
-//  display.println(servoClose);
-//  display.print("servoThrow= ");
-//  display.println(servoThrow);
-//  display.print("servoStep= ");
-//  display.println(servoStep);
-//  display.display(); // actually display all of the above
   
   // Attach servo on pin 9 to the servo object
    myservo.attach(SERVO_PIN);
    myservo.write(servoPos);  
-   // Read the initial state of inputCLK
+   // Read the initial state of INPUT_CLK
    // Assign to previousStateCLK variable
-   previousStateCLK = digitalRead(inputCLK); 
+   previousStateCLK = digitalRead(INPUT_CLK); 
  } //End Setup 
  
 void loop() {
   
-  // Read the current state of inputCLK
-   currentStateCLK = digitalRead(inputCLK);
+  // Read the current state of INPUT_CLK
+   currentStateCLK = digitalRead(INPUT_CLK);
     
-   // If the previous and the current state of the inputCLK are different then a pulse has occured
+   // If the previous and the current state of the INPUT_CLK are different then a pulse has occured
    if (currentStateCLK != previousStateCLK){ 
        
-     // If the inputDT state is different than the inputCLK state then 
+     // If the INPUT_DTstate is different than the INPUT_CLK state then 
      // the encoder is rotating counterclockwise
-     if (digitalRead(inputDT) != currentStateCLK) { 
+     if (digitalRead(INPUT_DT) != currentStateCLK) { 
        counter --;
        servoPos=servoPos-servoStep;
        if (servoPos<servoClose){
@@ -104,7 +97,7 @@ void loop() {
    } 
  
        // Read the button state
-  int btnState = digitalRead(inputSW);
+  int btnState = digitalRead(INPUT_SW);
 
   //If we detect LOW signal, button is pressed
   if (btnState == LOW) {
